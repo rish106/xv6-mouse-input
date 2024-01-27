@@ -30,25 +30,30 @@ idtinit(void)
 void
 trap(struct trapframe *tf)
 {
-  switch(tf->trapno){
-  case T_IRQ0 + IRQ_TIMER:
-    ticks++;
-    lapiceoi();
-    break;
-  case T_IRQ0 + IRQ_COM1:
-    uartintr();
-    lapiceoi();
-    break;
-  case T_IRQ0 + 7:
-  case T_IRQ0 + IRQ_SPURIOUS:
-    cprintf("cpu%d: spurious interrupt at %x:%x\n",
-            cpuid(), tf->cs, tf->eip);
-    lapiceoi();
-    break;
+    switch(tf->trapno){
+        case T_IRQ0 + IRQ_TIMER:
+            ticks++;
+            lapiceoi();
+            break;
+        case T_IRQ0 + IRQ_COM1:
+            uartintr();
+            lapiceoi();
+            break;
+        case T_IRQ0 + IRQ_MOUSE:
+            mouseintr();
+            lapiceoi();
+            break;
+        case T_IRQ0 + 7:
+            break;
+        case T_IRQ0 + IRQ_SPURIOUS:
+            cprintf("cpu%d: spurious interrupt at %x:%x\n",
+                    cpuid(), tf->cs, tf->eip);
+            lapiceoi();
+            break;
 
-  default:
-    cprintf("unexpected trap %d from cpu %d eip %x (cr2=0x%x)\n",
-            tf->trapno, cpuid(), tf->eip, rcr2());
-    panic("trap");
-  }
+        default:
+            cprintf("unexpected trap %d from cpu %d eip %x (cr2=0x%x)\n",
+                    tf->trapno, cpuid(), tf->eip, rcr2());
+            panic("trap");
+    }
 }

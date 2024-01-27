@@ -4,11 +4,17 @@
 #include "mouse.h"
 #include "traps.h"
 
+#define SEND_BUSY       0x02
+#define RECV_BUSY       0x01
+#define MSDEFAULT       0xF6
+#define MSACTIVATE      0xF4
+#define MSCPU           0
+
 // Wait until the mouse controller is ready for us to send a packet
 void 
 mousewait_send(void) 
 {
-    // Implement your code here
+    while (inb(MSSTATP) & SEND_BUSY);
     return;
 }
 
@@ -16,7 +22,7 @@ mousewait_send(void)
 void 
 mousewait_recv(void) 
 {
-    // Implement your code here
+    while (!(inb(MSSTATP) & RECV_BUSY));
     return;
 }
 
@@ -25,20 +31,72 @@ mousewait_recv(void)
 void 
 mousecmd(uchar cmd) 
 {
-    // Implement your code here
+    mousewait_send();
+
+    outb(MSSTATP, PS2MS);
+    mousewait_send();
+    outb(MSDATAP, cmd);
+
+    mousewait_recv();
+
+    while (inb(MSDATAP) != MSACK);
+
     return;
 }
 
+// To activate the mouse when the system boots up
 void
 mouseinit(void)
 {
-    // Implement your code here
+
+    mousewait_send();
+
+    outb(MSSTATP, MSEN);
+
+    mousewait_send();
+    outb(MSSTATP, 0x20);
+
+    mousewait_recv();
+    uchar status_byte = inb(MSDATAP);
+    status_byte = status_byte | 0x02;
+
+    mousewait_send();
+    outb(MSSTATP, 0x60);
+
+    mousewait_send();
+    outb(MSDATAP, status_byte);
+
+    mousecmd(MSDEFAULT);
+    mousecmd(MSACTIVATE);
+
+    ioapicenable(IRQ_MOUSE, MSCPU);
+
     return;
+
 }
 
+// To handle an interrupt raised by the mouse controller 
 void
 mouseintr(void)
 {
-    // Implement your code here
+
+    mousewait_recv();
+    uint packet = 0;
+
+    for (uint i = 0; i < 3; i++) {
+        uint curr = inb(MSDATAP);
+        uint offset = 8 * i;
+        packet = packet | (curr << offset);
+    }
+
+    if (packet & 0b0001) {
+        cprintf("LEFT\n");
+    } else if (packet & 0b0010) {
+        cprintf("RIGHT\n");
+    } else if (packet & 0b0100) {
+        cprintf("MID\n");
+    }
+
     return;
+
 }

@@ -15,6 +15,7 @@ main(void)
   picinit();       // disable pic
   ioapicinit();    // another interrupt controller
   uartinit();      // serial port
+  mouseinit();
   tvinit();        // trap vectors
   idtinit();       // load idt register
   sti();
