@@ -44,13 +44,13 @@ make xv6.img
 #make
 
 echo "Running..0"
-timeout 10s ./test_lab1.sh 1 | grep -E "LEFT|MID|RIGHT" | sed 's/(qemu) //g'|sort > res_lab1_0
+timeout 5s ./test_lab1.sh 1 | grep -E "LEFT|MID|RIGHT" | sed 's/(qemu) //g'|sort > res_lab1_0
 
 echo "Running..1"
-timeout 10s ./test_lab1.sh 2 | grep -E "LEFT|MID|RIGHT" | sed 's/(qemu) //g'|sort > res_lab1_1
+timeout 5s ./test_lab1.sh 2 | grep -E "LEFT|MID|RIGHT" | sed 's/(qemu) //g'|sort > res_lab1_1
 
 echo "Running..2"
-timeout 10s ./test_lab1.sh 4 | grep -E "LEFT|MID|RIGHT" | sed 's/(qemu) //g'|sort > res_lab1_2
+timeout 5s ./test_lab1.sh 4 | grep -E "LEFT|MID|RIGHT" | sed 's/(qemu) //g'|sort > res_lab1_2
 
 check_test=3
 total_test=0

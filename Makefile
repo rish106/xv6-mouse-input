@@ -143,7 +143,7 @@ qemu: xv6.img
 	$(QEMU) -nographic $(QEMUOPTS)
 
 qemu-autograde: xv6.img
-    $(QEMU) -nographic -serial mon:stdio $(QEMUOPTS)
+	$(QEMU) -nographic -serial mon:stdio $(QEMUOPTS)
 
 .gdbinit: .gdbinit.tmpl
 	sed "s/localhost:1234/localhost:$(GDBPORT)/" < $^ > $@

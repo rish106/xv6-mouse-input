@@ -71,6 +71,8 @@ mouseinit(void)
 
     ioapicenable(IRQ_MOUSE, MSCPU);
 
+    cprintf("Mouse has been initialized\n");
+
     return;
 
 }
