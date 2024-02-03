@@ -140,7 +140,7 @@ endif
 QEMUOPTS = -drive file=xv6.img,index=0,media=disk,format=raw -smp $(CPUS) -m 512 $(QEMUEXTRA)
 
 qemu: xv6.img
-	$(QEMU) -nographic $(QEMUOPTS)
+	$(QEMU) -serial mon:stdio $(QEMUOPTS)
 
 qemu-autograde: xv6.img
 	$(QEMU) -nographic -serial mon:stdio $(QEMUOPTS)

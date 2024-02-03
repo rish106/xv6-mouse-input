@@ -34,7 +34,6 @@ mousecmd(uchar cmd)
     mousewait_send();
 
     outb(MSSTATP, PS2MS);
-    mousewait_send();
     outb(MSDATAP, cmd);
 
     mousewait_recv();
@@ -82,21 +81,25 @@ void
 mouseintr(void)
 {
 
-    mousewait_recv();
-    uint packet = 0;
+    while (inb(MSSTATP) & 0b0001) {
 
-    for (uint i = 0; i < 3; i++) {
-        uint curr = inb(MSDATAP);
-        uint offset = 8 * i;
-        packet = packet | (curr << offset);
-    }
+        mousewait_recv();
+        uint packet = 0;
 
-    if (packet & 0b0001) {
-        cprintf("LEFT\n");
-    } else if (packet & 0b0010) {
-        cprintf("RIGHT\n");
-    } else if (packet & 0b0100) {
-        cprintf("MID\n");
+        for (uint i = 0; i < 3; i++) {
+            uint curr = inb(MSDATAP);
+            uint offset = 8 * i;
+            packet = packet | (curr << offset);
+        }
+
+        if (packet & 0b0001) {
+            cprintf("LEFT\n");
+        } else if (packet & 0b0010) {
+            cprintf("RIGHT\n");
+        } else if (packet & 0b0100) {
+            cprintf("MID\n");
+        }
+
     }
 
     return;
